@@ -4,7 +4,9 @@ import MicrophonePlugin from 'wavesurfer.js/dist/plugin/wavesurfer.microphone'
 
 export const Waveform = (): React.ReactElement => {
   const [ waveformBuilt, setWaveformBuilt ] = useState(false);
-  const [ waveForm, setWaveForm ] = useState<null | WaveSurfer>(null)
+  const [ waveForm, setWaveForm ] = useState<null | WaveSurfer>(null);
+  const [ isRecording, setIsRecording ] = useState<boolean>(false);
+  const [ mediaRecorder, setMediaRecorder ] = useState<MediaRecorder | null>(null);
 
   const buildWaveform = (): void => {
     setWaveForm(WaveSurfer.create({
@@ -25,9 +27,38 @@ export const Waveform = (): React.ReactElement => {
     setWaveformBuilt(true);
   }
 
-  useEffect(() => {
+  const startRecord = (): void => {
     if (!waveformBuilt) buildWaveform();
-  }, [waveformBuilt]);
+    if (!waveForm) return
+
+    waveForm.microphone.start();
+    setIsRecording(true);
+
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then(stream => {
+        setMediaRecorder(new MediaRecorder(stream, {
+          audioBitsPerSecond: 128000
+        }))
+
+        if (!mediaRecorder) return
+        mediaRecorder.start()
+
+        const audioChunks: Blob[] = []
+        mediaRecorder.addEventListener('dataavailable', (event: BlobEvent) => {
+          audioChunks.push(event.data)
+          console.log('this is working')
+        })
+
+        // mediaRecorder.addEventListener('stop', () => {
+        //   const audioBlob = new Blob(audioChunks)
+        //   convertBlobToText(audioBlob)
+        // })
+      })
+  }
+
+  useEffect(() => {
+    startRecord();
+  }, []);
 
   return (
     <div id="waveform"></div>
