@@ -1,7 +1,7 @@
 import React from 'react';
 import { RecordButton } from './components/RecordButton';
 import './App.css';
-import 'papercss/dist/paper.min.css';
+import '../node_modules/papercss/dist/paper.min.css';
 
 function App() {
   return (
