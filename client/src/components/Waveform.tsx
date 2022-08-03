@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import WaveSurfer from 'wavesurfer.js'
-// import * as MicrophonePlugin from 'wavesurfer.js/dist/plugin/wavesurfer.microphone'
+import MicrophonePlugin from 'wavesurfer.js/dist/plugin/wavesurfer.microphone'
 
 export const Waveform = (): React.ReactElement => {
   const [ waveformBuilt, setWaveformBuilt ] = useState(false);
@@ -17,17 +17,17 @@ export const Waveform = (): React.ReactElement => {
       interact: false,
       cursorWidth: 0,
       height: 200,
-      normalize: true
-      // plugins: [
-      //   MicrophonePlugin.create()
-      // ]
+      normalize: true,
+      plugins: [
+        MicrophonePlugin.create()
+      ]
     }));
     setWaveformBuilt(true);
   }
 
   useEffect(() => {
-    buildWaveform();
-  }, [])
+    if (!waveformBuilt) buildWaveform();
+  }, [waveformBuilt]);
 
   return (
     <div id="waveform"></div>
